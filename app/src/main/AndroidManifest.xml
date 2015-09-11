@@ -3,8 +3,8 @@
     package="audio.rabid.dev.wallpapersetter" >
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
-    <uses-permission android:name="android.permission.INTERNET"/>
-    <uses-permission android:name="android.permission.SET_WALLPAPER"/>
+    <uses-permission android:name="android.permission.INTERNET" />
+    <uses-permission android:name="android.permission.SET_WALLPAPER" />
 
     <application
         android:allowBackup="true"
@@ -24,7 +24,23 @@
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
         </receiver>
+        <receiver
+            android:name=".MusicPlaybackBroadcastReceiver"
+            android:enabled="true"
+            android:exported="true" >
 
+            <intent-filter>
+                <action android:name="com.android.music.playbackstatechanged"/>
+                <action android:name="com.htc.music.playbackstatechanged"/>
+                <action android:name="fm.last.android.playbackstatechanged"/>
+                <action android:name="com.spotify.music.playbackstatechanged"/>
+
+                <action android:name="com.android.music.metachanged"/>
+                <action android:name="com.htc.music.metachanged"/>
+                <action android:name="fm.last.android.metachanged"/>
+                <action android:name="com.spotify.music.metachanged"/>
+            </intent-filter>
+        </receiver>
     </application>
 
 </manifest>

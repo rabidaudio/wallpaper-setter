@@ -2,6 +2,7 @@ package audio.rabid.dev.wallpapersetter;
 
 import android.app.IntentService;
 import android.app.WallpaperManager;
+import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.os.Handler;
@@ -16,12 +17,12 @@ public class WallpaperSetService extends IntentService {
     WallpaperGetter wallpaperGetter;
     WallpaperManager wallpaperManager;
 
-    public static final String ACTION_CHANGE_FLICKR_WALLPAPER = "ACTION_CHANGE_FLICKR_WALLPAPER";
-    public static final String ACTION_RESTORE_FLICKR_WALLPAPER = "ACTION_RESTORE_FLICKR_WALLPAPER";
-    public static final String ACTION_SET_ALBUM_ART = "ACTION_SET_ALBUM_ART";
+    protected static final String ACTION_CHANGE_FLICKR_WALLPAPER = "ACTION_CHANGE_FLICKR_WALLPAPER";
+    protected static final String ACTION_RESTORE_FLICKR_WALLPAPER = "ACTION_RESTORE_FLICKR_WALLPAPER";
+    protected static final String ACTION_SET_ALBUM_ART = "ACTION_SET_ALBUM_ART";
 
-    public static final String EXTRA_ARTIST = "EXTRA_ARTIST";
-    public static final String EXTRA_ALBUM = "EXTRA_ALBUM";
+    private static final String EXTRA_ARTIST = "EXTRA_ARTIST";
+    private static final String EXTRA_ALBUM = "EXTRA_ALBUM";
 
     public WallpaperSetService() {
         super("WallpaperSetService");
@@ -33,6 +34,26 @@ public class WallpaperSetService extends IntentService {
         //initialize things with context
         wallpaperGetter = new WallpaperGetter(this);
         wallpaperManager = WallpaperManager.getInstance(this);
+    }
+
+    public static void changeArt(Context context, String artist, String album){
+        Intent i = new Intent(context, WallpaperSetService.class);
+        i.setAction(ACTION_SET_ALBUM_ART);
+        i.putExtra(EXTRA_ARTIST, artist);
+        i.putExtra(EXTRA_ALBUM, album);
+        context.startService(i);
+    }
+
+    public static void restoreBackground(Context context){
+        Intent i = new Intent(context, WallpaperSetService.class);
+        i.setAction(WallpaperSetService.ACTION_RESTORE_FLICKR_WALLPAPER);
+        context.startService(i);
+    }
+
+    public static void setNewBackground(Context context){
+        Intent i = new Intent(context, WallpaperSetService.class);
+        i.setAction(WallpaperSetService.ACTION_CHANGE_FLICKR_WALLPAPER);
+        context.startService(i);
     }
 
     @Override
@@ -59,13 +80,14 @@ public class WallpaperSetService extends IntentService {
         }
     }
 
-    private void setAlbumArtWallpaper(String artist, String album){
+    private void setAlbumArtWallpaper(final String artist, final String album){
         Log.d(TAG, "getting album wallpaper for "+artist+" - "+album);
+
         wallpaperGetter.getAlbumArt(artist, album, new WallpaperGetter.BitmapCallback() {
             @Override
             public void onBitmap(Bitmap bitmap) {
                 try{
-                    Log.d(TAG, "setting wallpaper: "+bitmap.toString());
+                    Log.d(TAG, "setting wallpaper: " + bitmap.toString());
                     wallpaperManager.setBitmap(bitmap);
                 }catch (Exception e){
                     onException(e);
@@ -92,7 +114,7 @@ public class WallpaperSetService extends IntentService {
     private void restoreFlickrWallpaper(){
         try {
             Bitmap b = wallpaperGetter.getLastFlickrWallpaper();
-            Log.d(TAG, "setting wallpaper: "+b.toString());
+            Log.d(TAG, "setting wallpaper: " + b.toString());
             wallpaperManager.setBitmap(b);
         }catch (Exception e){
             onException(e);

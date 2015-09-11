@@ -9,8 +9,6 @@ import android.content.Intent;
 import java.util.Calendar;
 
 public class BootAlarmSetBroadcastReceiver extends BroadcastReceiver {
-    public BootAlarmSetBroadcastReceiver() {
-    }
 
     @Override
     public void onReceive(Context context, Intent intent) {

@@ -21,24 +21,18 @@ public class DebugActivity extends AppCompatActivity implements View.OnClickList
 
     @Override
     public void onClick(View v) {
-        Intent i = new Intent(this, WallpaperSetService.class);
-
         switch (v.getId()){
             case R.id.changeBackground:
-                i.setAction(WallpaperSetService.ACTION_CHANGE_FLICKR_WALLPAPER);
+                WallpaperSetService.setNewBackground(this);
                 break;
-            
+
             case R.id.restoreFlickr:
-                i.setAction(WallpaperSetService.ACTION_RESTORE_FLICKR_WALLPAPER);
+                WallpaperSetService.restoreBackground(this);
                 break;
 
             case R.id.setAlbumArt:
-                i.setAction(WallpaperSetService.ACTION_SET_ALBUM_ART);
-                i.putExtra(WallpaperSetService.EXTRA_ARTIST, "Wye Oak");
-                i.putExtra(WallpaperSetService.EXTRA_ALBUM, "Shriek");
+                WallpaperSetService.changeArt(this, "Wye Oak", "Shriek");
                 break;
         }
-
-        startService(i);
     }
 }
