@@ -5,6 +5,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.net.Uri;
+import android.util.Log;
 
 import com.koushikdutta.async.http.AsyncHttpClient;
 import com.koushikdutta.async.http.AsyncHttpGet;
@@ -17,6 +18,8 @@ import java.io.File;
  */
 public class WallpaperGetter {
 
+    private static final String TAG = WallpaperGetter.class.getSimpleName();
+
     private static final Uri SERVER_URL = Uri.parse("https://random-flickr-image.herokuapp.com");
 
     private static final int OPACITY = 30;
@@ -27,16 +30,23 @@ public class WallpaperGetter {
 
     private SharedPreferences preferences;
 
+    private File flickrFile, albumartFile;
+
     public WallpaperGetter(Context context){
         preferences = context.getSharedPreferences(WallpaperGetter.class.getSimpleName(), Context.MODE_PRIVATE);
+
+        flickrFile = new File(context.getCacheDir(), "flickr.jpg");
+        albumartFile = new File(context.getCacheDir(), "albumart.jpg");
     }
 
     public void getRandomFickrImage(final BitmapCallback callback){
-        Uri flickr = Uri.withAppendedPath(SERVER_URL, "/").buildUpon()
+        Uri flickr = Uri.withAppendedPath(SERVER_URL, "").buildUpon()
                 .appendQueryParameter("opacity", String.valueOf(OPACITY))
                 .build();
 
-        AsyncHttpClient.getDefaultInstance().executeFile(new AsyncHttpGet(flickr), "flickr.jpg", new AsyncHttpClient.FileCallback() {
+        Log.d(TAG, "Downloading file "+flickr.toString());
+
+        AsyncHttpClient.getDefaultInstance().executeFile(new AsyncHttpGet(flickr), flickrFile.getAbsolutePath(), new AsyncHttpClient.FileCallback() {
             @Override
             public void onCompleted(Exception e, AsyncHttpResponse source, File result) {
                 preferences.edit().putString(PREF_WALLPAPER_LOCATION, result.getAbsolutePath()).apply();
@@ -46,13 +56,16 @@ public class WallpaperGetter {
     }
 
     public void getAlbumArt(String artist, String album, final BitmapCallback callback){
-        Uri albumArt = Uri.withAppendedPath(SERVER_URL, "/albumart").buildUpon()
+        Uri albumArt = Uri.withAppendedPath(SERVER_URL, "albumart").buildUpon()
                 .appendQueryParameter("opacity", String.valueOf(OPACITY))
                 .appendQueryParameter("artist", artist)
                 .appendQueryParameter("album", album)
                 .appendQueryParameter("size", ART_SIZE)
                 .build();
-        AsyncHttpClient.getDefaultInstance().executeFile(new AsyncHttpGet(albumArt), "albumart.jpg", new AsyncHttpClient.FileCallback() {
+
+        Log.d(TAG, "Downloading file "+albumArt.toString());
+
+        AsyncHttpClient.getDefaultInstance().executeFile(new AsyncHttpGet(albumArt), albumartFile.getAbsolutePath(), new AsyncHttpClient.FileCallback() {
             @Override
             public void onCompleted(Exception e, AsyncHttpResponse source, File result) {
                 callback.onBitmap(BitmapFactory.decodeFile(result.getAbsolutePath()));
