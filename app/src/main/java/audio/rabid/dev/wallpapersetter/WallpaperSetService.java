@@ -74,8 +74,6 @@ public class WallpaperSetService extends IntentService {
                     String album = intent.getStringExtra(EXTRA_ALBUM);
                     setAlbumArtWallpaper(artist, album);
                     break;
-
-                //TODO music case
             }
         }
     }
@@ -91,6 +89,7 @@ public class WallpaperSetService extends IntentService {
                     wallpaperManager.setBitmap(bitmap);
                 }catch (Exception e){
                     onException(e);
+                    restoreFlickrWallpaper();
                 }
             }
         });
@@ -106,6 +105,7 @@ public class WallpaperSetService extends IntentService {
                     wallpaperManager.setBitmap(bitmap);
                 } catch (Exception e) {
                     onException(e);
+                    restoreFlickrWallpaper();
                 }
             }
         });
