@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
-    package="audio.rabid.dev.wallpapersetter" >
+    package="audio.rabid.dev.wallpapersetter">
 
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.INTERNET" />
@@ -10,16 +10,15 @@
         android:allowBackup="true"
         android:icon="@mipmap/ic_launcher"
         android:label="@string/app_name"
-        android:theme="@style/AppTheme" >
+        android:theme="@style/AppTheme">
         <service
             android:name=".WallpaperSetService"
-            android:exported="false" >
-        </service>
+            android:exported="false"/>
 
         <receiver
             android:name=".BootAlarmSetBroadcastReceiver"
             android:enabled="true"
-            android:exported="true" >
+            android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
             </intent-filter>
@@ -27,26 +26,33 @@
         <receiver
             android:name=".MusicPlaybackBroadcastReceiver"
             android:enabled="true"
-            android:exported="true" >
-
+            android:exported="true">
             <intent-filter>
+
                 <!-- TODO These can probably be cleaned up a bit... -->
-                <action android:name="com.android.music.playbackstatechanged"/>
-                <action android:name="com.htc.music.playbackstatechanged"/>
-                <action android:name="fm.last.android.playbackstatechanged"/>
-                <action android:name="com.spotify.music.playbackstatechanged"/>
-
-                <action android:name="com.android.music.playstatechanged"/>
-                <action android:name="com.htc.music.playstatechanged"/>
-                <action android:name="fm.last.android.playstatechanged"/>
-                <action android:name="com.spotify.music.playstatechanged"/>
-
-                <action android:name="com.android.music.metachanged"/>
-                <action android:name="com.htc.music.metachanged"/>
-                <action android:name="fm.last.android.metachanged"/>
-                <action android:name="com.spotify.music.metachanged"/>
+                <action android:name="com.android.music.playbackstatechanged" />
+                <action android:name="com.htc.music.playbackstatechanged" />
+                <action android:name="fm.last.android.playbackstatechanged" />
+                <action android:name="com.spotify.music.playbackstatechanged" />
+                <action android:name="com.android.music.playstatechanged" />
+                <action android:name="com.htc.music.playstatechanged" />
+                <action android:name="fm.last.android.playstatechanged" />
+                <action android:name="com.spotify.music.playstatechanged" />
+                <action android:name="com.android.music.metachanged" />
+                <action android:name="com.htc.music.metachanged" />
+                <action android:name="fm.last.android.metachanged" />
+                <action android:name="com.spotify.music.metachanged" />
             </intent-filter>
         </receiver>
+
+        <activity android:name=".MainActivity"
+            android:label="@string/activity_main_title">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
     </application>
 
 </manifest>
