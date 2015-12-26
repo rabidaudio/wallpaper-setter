@@ -20,10 +20,9 @@ public class WallpaperSetService extends IntentService {
 
     private static final String TAG = WallpaperSetService.class.getSimpleName();
 
-
-
     WallpaperGetter wallpaperGetter;
     WallpaperManager wallpaperManager;
+    SharedPreferences preferences;
 
     protected static final String ACTION_CHANGE_FLICKR_WALLPAPER = "ACTION_CHANGE_FLICKR_WALLPAPER";
     protected static final String ACTION_RESTORE_FLICKR_WALLPAPER = "ACTION_RESTORE_FLICKR_WALLPAPER";
@@ -43,6 +42,7 @@ public class WallpaperSetService extends IntentService {
         //initialize things with context
         wallpaperGetter = new WallpaperGetter(this);
         wallpaperManager = WallpaperManager.getInstance(this);
+        preferences = PreferenceManager.getDefaultSharedPreferences(this);
     }
 
     public static void changeArt(Context context, String artist, String album){
@@ -76,6 +76,7 @@ public class WallpaperSetService extends IntentService {
         if (intent != null) {
             final String action = intent.getAction();
             switch (action){
+
                 case ACTION_CHANGE_FLICKR_WALLPAPER:
                     setNewFlickrWallpaper();
                     break;
@@ -98,6 +99,9 @@ public class WallpaperSetService extends IntentService {
     }
 
     private void setAlbumArtWallpaper(final String artist, final String album){
+        if(!preferences.getBoolean(WallpaperPreferenceFragment.PREF_ALBUM_ART_ENABLED, true)){
+            return;
+        }
         Log.d(TAG, "getting album wallpaper for "+artist+" - "+album);
 
         wallpaperGetter.getAlbumArt(artist, album, new WallpaperGetter.BitmapCallback() {
@@ -115,6 +119,9 @@ public class WallpaperSetService extends IntentService {
     }
 
     private void setNewFlickrWallpaper(){
+        if(!preferences.getBoolean(WallpaperPreferenceFragment.PREF_FLICKR_ENABLED, true)){
+            return;
+        }
         Log.d(TAG, "getting new flickr wallpaper");
         wallpaperGetter.getRandomFickrImage(new WallpaperGetter.BitmapCallback() {
             @Override
@@ -160,9 +167,12 @@ public class WallpaperSetService extends IntentService {
         Intent i = new Intent(this, WallpaperSetService.class);
         i.setAction(WallpaperSetService.ACTION_CHANGE_FLICKR_WALLPAPER);
 
-        SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(this);
+        if(!preferences.getBoolean(WallpaperPreferenceFragment.PREF_FLICKR_ENABLED, true)){
+            return;
+        }
 
-        long interval = intervalCode(preferences.getString(WallpaperPreferenceFragment.PREF_INTERVAL, "INTERVAL_DAY"));
+        String intervalString = preferences.getString(WallpaperPreferenceFragment.PREF_INTERVAL, "INTERVAL_DAY");
+        long interval = intervalCode(intervalString);
         String[] startTime = preferences.getString(WallpaperPreferenceFragment.PREF_START, "08:00").split(":");
         int startHour = Integer.valueOf(startTime[0]);
         int startMinute = Integer.valueOf(startTime[1]);
@@ -175,23 +185,7 @@ public class WallpaperSetService extends IntentService {
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 interval, PendingIntent.getBroadcast(this, 0, i, 0));
 
-        Log.i("Wallpaper", "Setting wallpaper alarm for hour "+startHour+" and every "+intervalString(interval));
-    }
-
-    private static String intervalString(long intervalCode){
-        if (intervalCode == AlarmManager.INTERVAL_DAY) {
-            return "Day";
-        } else if (intervalCode == AlarmManager.INTERVAL_HALF_DAY) {
-            return "Half-day";
-        } else if (intervalCode == AlarmManager.INTERVAL_HOUR) {
-            return "Hour";
-        } else if (intervalCode == AlarmManager.INTERVAL_HALF_HOUR) {
-            return "Half-hour";
-        } else if (intervalCode == AlarmManager.INTERVAL_FIFTEEN_MINUTES) {
-            return "Fifteen minutes";
-        } else {
-            return "Unknown";
-        }
+        Log.i("Wallpaper", "Setting wallpaper alarm for hour "+startHour+" and every "+intervalString);
     }
 
     private static long intervalCode(String intervalString){
