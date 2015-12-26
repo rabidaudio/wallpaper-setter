@@ -5,6 +5,8 @@ import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
+import android.util.Log;
+import android.widget.Toast;
 
 import java.util.Calendar;
 
@@ -28,6 +30,11 @@ public class BootAlarmSetBroadcastReceiver extends BroadcastReceiver {
             // constants--in this case, AlarmManager.INTERVAL_DAY.
             alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                     AlarmManager.INTERVAL_DAY, PendingIntent.getBroadcast(context, 0, i, 0));
+
+            Log.i("Wallpaper", "Setting wallpaper alarm");
+            if(BuildConfig.DEBUG){
+                Toast.makeText(context, "Setting wallpaper alarm", Toast.LENGTH_LONG).show();
+            }
         }
     }
 }

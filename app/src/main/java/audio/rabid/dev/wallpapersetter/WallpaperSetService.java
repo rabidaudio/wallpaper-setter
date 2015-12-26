@@ -114,8 +114,12 @@ public class WallpaperSetService extends IntentService {
     private void restoreFlickrWallpaper(){
         try {
             Bitmap b = wallpaperGetter.getLastFlickrWallpaper();
-            Log.d(TAG, "setting wallpaper: " + b.toString());
-            wallpaperManager.setBitmap(b);
+            if(b == null){
+                setNewFlickrWallpaper();
+            }else {
+                Log.d(TAG, "setting wallpaper: " + b.toString());
+                wallpaperManager.setBitmap(b);
+            }
         }catch (Exception e){
             onException(e);
         }
