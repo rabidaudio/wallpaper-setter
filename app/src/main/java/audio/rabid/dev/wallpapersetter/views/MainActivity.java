@@ -1,9 +1,15 @@
-package audio.rabid.dev.wallpapersetter;
+package audio.rabid.dev.wallpapersetter.views;
 
+import android.content.Intent;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
+import audio.rabid.dev.wallpapersetter.BuildConfig;
+import audio.rabid.dev.wallpapersetter.R;
+import audio.rabid.dev.wallpapersetter.WallpaperGetter;
+import audio.rabid.dev.wallpapersetter.WallpaperSetService;
 
 public class MainActivity extends AppCompatActivity {
 
@@ -21,6 +27,8 @@ public class MainActivity extends AppCompatActivity {
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         menu.add(R.string.fetch_new_wallpaper);
+        menu.add(R.string.manage_flickr_images);
+        menu.add(R.string.clear_cache);
 
         if(BuildConfig.DEBUG) {
             menu.add(R.string.set_album_art);
@@ -35,6 +43,10 @@ public class MainActivity extends AppCompatActivity {
         CharSequence i = item.getTitle();
         if (i.equals(getString(R.string.fetch_new_wallpaper))) {
             WallpaperSetService.setNewBackground(this);
+        }else if(i.equals(getString(R.string.manage_flickr_images))) {
+            startActivity(new Intent(this, PastFlickrImagePickr.class));
+        }else if(i.equals(getString(R.string.clear_cache))){
+            new WallpaperGetter(this).clearCache();
         } else if (i.equals(getString(R.string.restore_background))) {
             WallpaperSetService.restoreBackground(this);
         } else if (i.equals(getString(R.string.set_album_art))) {

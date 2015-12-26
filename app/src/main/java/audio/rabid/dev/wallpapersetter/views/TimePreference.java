@@ -1,4 +1,4 @@
-package audio.rabid.dev.wallpapersetter;
+package audio.rabid.dev.wallpapersetter.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;

@@ -7,6 +7,8 @@
     <string name="set_album_art">Set album art (debug)</string>
     <string name="restore_background">Restore background (debug)</string>
     <string name="set_change_alarm">Set change alarm (debug)</string>
+    <string name="manage_flickr_images">Manage Flickr Images</string>
+    <string name="clear_cache">Clear cache</string>
 
     <array name="album_art_sizes">
         <item>default</item>

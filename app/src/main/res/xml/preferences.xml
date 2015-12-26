@@ -2,7 +2,7 @@
 <PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:custom="http://schemas.android.com/apk/res-auto">
 
-    <audio.rabid.dev.wallpapersetter.ImageCompareSliderPreference
+    <audio.rabid.dev.wallpapersetter.views.ImageCompareSliderPreference
         android:key="PREF_OPACITY"
         android:title="Image Opacity"
         android:defaultValue="30"
@@ -17,7 +17,7 @@
             android:title="Flickr Source Enabled"
             android:defaultValue="true"/>
 
-        <audio.rabid.dev.wallpapersetter.TimePreference
+        <audio.rabid.dev.wallpapersetter.views.TimePreference
             android:key="PREF_START"
             android:title="Flickr Update Start"
             android:defaultValue="08:00"/>
@@ -45,6 +45,12 @@
             android:defaultValue="default"
             android:entryValues="@array/album_art_sizes"
             android:entries="@array/album_art_sizes"/>
+
+        <EditTextPreference
+            android:key="PREF_MAX_CACHE_SIZE"
+            android:title="Max Image Cache Size (MB)"
+            android:inputType="numberDecimal"
+            android:defaultValue="50.0" />
 
 
     <!--</PreferenceScreen>-->

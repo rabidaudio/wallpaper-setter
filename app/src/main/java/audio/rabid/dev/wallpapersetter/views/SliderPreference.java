@@ -1,4 +1,4 @@
-package audio.rabid.dev.wallpapersetter;
+package audio.rabid.dev.wallpapersetter.views;
 
 import android.content.Context;
 import android.content.res.TypedArray;
@@ -6,6 +6,8 @@ import android.preference.DialogPreference;
 import android.util.AttributeSet;
 import android.view.View;
 import android.widget.SeekBar;
+
+import audio.rabid.dev.wallpapersetter.R;
 
 /**
  * Created by  charles  on 12/26/15.

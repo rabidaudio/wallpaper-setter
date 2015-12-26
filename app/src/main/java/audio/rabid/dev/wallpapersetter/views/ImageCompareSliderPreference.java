@@ -1,4 +1,4 @@
-package audio.rabid.dev.wallpapersetter;
+package audio.rabid.dev.wallpapersetter.views;
 
 import android.content.Context;
 import android.graphics.Bitmap;
@@ -13,6 +13,8 @@ import android.widget.SeekBar;
 import android.widget.SeekBar.OnSeekBarChangeListener;
 
 import java.io.IOException;
+
+import audio.rabid.dev.wallpapersetter.R;
 
 /**
  * Created by  charles  on 12/26/15.

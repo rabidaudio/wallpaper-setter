@@ -6,6 +6,8 @@ import android.content.Intent;
 import android.content.SharedPreferences;
 import android.preference.PreferenceManager;
 
+import audio.rabid.dev.wallpapersetter.views.WallpaperPreferenceFragment;
+
 public class BootAlarmSetBroadcastReceiver extends BroadcastReceiver {
 
     @Override
