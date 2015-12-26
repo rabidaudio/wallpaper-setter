@@ -1,0 +1,53 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:custom="http://schemas.android.com/apk/res-auto">
+
+    <audio.rabid.dev.wallpapersetter.ImageCompareSliderPreference
+        android:key="PREF_OPACITY"
+        android:title="Image Opacity"
+        android:defaultValue="30"
+        custom:slider_preference_max="100" />
+
+
+    <!--<PreferenceScreen-->
+        <!--android:title="Flickr Wallpaper" >-->
+
+        <CheckBoxPreference
+            android:key="PREF_FLICKR_ENABLED"
+            android:title="Flickr Source Enabled"
+            android:defaultValue="true"/>
+
+        <audio.rabid.dev.wallpapersetter.TimePreference
+            android:key="PREF_START"
+            android:title="Flickr Update Start"
+            android:defaultValue="08:00"/>
+
+        <ListPreference
+            android:key="PREF_INTERVAL"
+            android:title="Flickr Update Interval"
+            android:entries="@array/interval_names"
+            android:defaultValue="INTERVAL_DAY"
+            android:entryValues="@array/intervals"/>
+
+    <!--</PreferenceScreen>-->
+
+    <!--<PreferenceScreen-->
+        <!--android:title="Album Art Wallpaper" >-->
+
+        <CheckBoxPreference
+            android:key="PREF_ALBUM_ART_ENABLED"
+            android:title="Album Art Backgrounds Enabled"
+            android:defaultValue="true" />
+
+        <ListPreference
+            android:key="PREF_RESOLUTION"
+            android:title="Album Art Resolution"
+            android:defaultValue="default"
+            android:entryValues="@array/album_art_sizes"
+            android:entries="@array/album_art_sizes"/>
+
+
+    <!--</PreferenceScreen>-->
+
+
+</PreferenceScreen>
