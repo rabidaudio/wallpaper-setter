@@ -21,7 +21,7 @@ import audio.rabid.dev.wallpapersetter.R;
  */
 public class ImageCompareSliderPreference extends SliderPreference implements OnSeekBarChangeListener {
 
-    ImageView left;
+    ImageView left, right;
 
     public ImageCompareSliderPreference(Context con, AttributeSet attrs) {
         super(con, attrs);
@@ -34,20 +34,16 @@ public class ImageCompareSliderPreference extends SliderPreference implements On
         ViewGroup v = (ViewGroup) layoutInflater.inflate(R.layout.dialog_fragment_image_comparer_preference, null);
         v.addView(parent);
         left = (ImageView) v.findViewById(R.id.imageLeft);
+        right = (ImageView) v.findViewById(R.id.imageRight);
         getSeekBar().setOnSeekBarChangeListener(this);
         return v;
     }
 
     @Override
-    protected void onBindDialogView(View v) {
-//        left = (ImageView) v.findViewById(R.id.imageLeft);
-        super.onBindDialogView(v);
-    }
-
-    @Override
     public void onProgressChanged(SeekBar seekBar, int progress, boolean fromUser) {
         try {
-            left.setImageBitmap(loadFromAssets(getContext(), progress));
+            left.setImageBitmap(loadLeftFromAssets(getContext(), progress));
+            right.setImageBitmap(loadRightFromAssets(getContext(), progress));
         }catch (IOException e){
             Log.e("Wallpaper", "Problem loading asset", e);
         }
@@ -63,7 +59,11 @@ public class ImageCompareSliderPreference extends SliderPreference implements On
 
     }
 
-    private static Bitmap loadFromAssets(Context context, int opacity) throws IOException {
-        return BitmapFactory.decodeStream(context.getAssets().open("samples/Wye%20Oak_Shriek_"+String.valueOf(opacity)+".png"));
+    private static Bitmap loadLeftFromAssets(Context context, int opacity) throws IOException {
+        return BitmapFactory.decodeStream(context.getAssets().open("samples/wye/Wye%20Oak_Shriek_"+String.valueOf(opacity)+".png"));
+    }
+
+    private static Bitmap loadRightFromAssets(Context context, int opacity) throws IOException {
+        return BitmapFactory.decodeStream(context.getAssets().open("samples/jay/Jay-Z_The%20Black%20Album_"+String.valueOf(opacity)+".png"));
     }
 }

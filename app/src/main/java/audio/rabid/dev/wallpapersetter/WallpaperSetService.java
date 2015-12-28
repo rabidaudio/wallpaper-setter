@@ -203,7 +203,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
         alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
                 interval, PendingIntent.getBroadcast(this, 0, i, 0));
 
-        Log.i("Wallpaper", "Setting wallpaper alarm for hour "+startHour+" and every "+intervalString);
+        Log.i("Wallpaper", "Setting wallpaper alarm for "+startHour+":"+startMinute+" and every "+intervalString);
     }
 
     private static long intervalCode(String intervalString){
