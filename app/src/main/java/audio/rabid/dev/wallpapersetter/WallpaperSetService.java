@@ -10,6 +10,7 @@ import android.content.SharedPreferences;
 import android.graphics.Bitmap;
 import android.os.Handler;
 import android.os.Looper;
+import android.os.SystemClock;
 import android.preference.PreferenceManager;
 import android.util.Log;
 import android.widget.Toast;
@@ -19,8 +20,6 @@ import java.util.Calendar;
 import audio.rabid.dev.wallpapersetter.views.WallpaperPreferenceFragment;
 
 public class WallpaperSetService extends IntentService implements WallpaperGetter.BitmapCallback {
-
-    private static final String TAG = WallpaperSetService.class.getSimpleName();
 
     WallpaperGetter wallpaperGetter;
     WallpaperManager wallpaperManager;
@@ -119,7 +118,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
         if(!preferences.getBoolean(WallpaperPreferenceFragment.PREF_ALBUM_ART_ENABLED, true)){
             return;
         }
-        Log.d(TAG, "getting album wallpaper for "+artist+" - "+album);
+        Log.d("Wallpaper", "getting album wallpaper for "+artist+" - "+album);
         wallpaperGetter.getAlbumArt(artist, album, this);
     }
 
@@ -127,7 +126,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
         if(!preferences.getBoolean(WallpaperPreferenceFragment.PREF_FLICKR_ENABLED, true)){
             return;
         }
-        Log.d(TAG, "getting new flickr wallpaper");
+        Log.d("Wallpaper", "getting new flickr wallpaper");
         wallpaperGetter.getRandomFickrImage(this);
     }
 
@@ -137,7 +136,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
             if(b == null){
                 setNewFlickrWallpaper();
             }else {
-                Log.d(TAG, "setting wallpaper");
+                Log.d("Wallpaper", "setting wallpaper");
                 wallpaperManager.setBitmap(b);
             }
         }catch (Exception e){
@@ -149,7 +148,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
         try {
             Bitmap b = wallpaperGetter.getPastFlickrWallpaper(key);
             if(b != null){
-                Log.d(TAG, "setting wallpaper");
+                Log.d("Wallpaper", "setting wallpaper");
                 wallpaperManager.setBitmap(b);
             }
         }catch (Exception e){
@@ -159,7 +158,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
 
     @Override
     public void onBitmap(Bitmap bitmap) {
-        Log.d(TAG, "setting wallpaper");
+        Log.d("Wallpaper", "setting wallpaper");
         try {
             wallpaperManager.setBitmap(bitmap);
         } catch (Exception e) {
@@ -173,7 +172,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
         new Handler(Looper.getMainLooper()).post(new Runnable() {
             @Override
             public void run() {
-                Log.e(TAG, "Problem setting wallpaper", e);
+                Log.e("Wallpaper", "Problem setting wallpaper", e);
                 Toast.makeText(WallpaperSetService.this, "Problem Setting Wallpaper", Toast.LENGTH_LONG).show();
             }
         });
@@ -184,6 +183,7 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
 
         Intent i = new Intent(this, WallpaperSetService.class);
         i.setAction(WallpaperSetService.ACTION_CHANGE_FLICKR_WALLPAPER);
+        PendingIntent pendingIntent = PendingIntent.getService(this, 0, i, PendingIntent.FLAG_CANCEL_CURRENT);
 
         if(!preferences.getBoolean(WallpaperPreferenceFragment.PREF_FLICKR_ENABLED, true)){
             return;
@@ -195,13 +195,16 @@ public class WallpaperSetService extends IntentService implements WallpaperGette
         int startHour = Integer.valueOf(startTime[0]);
         int startMinute = Integer.valueOf(startTime[1]);
 
+        long currentTime = System.currentTimeMillis();
         Calendar calendar = Calendar.getInstance();
-        calendar.setTimeInMillis(System.currentTimeMillis());
+        calendar.setTimeInMillis(currentTime);
         calendar.set(Calendar.HOUR_OF_DAY, startHour);
         calendar.set(Calendar.MINUTE, startMinute);
+        calendar.set(Calendar.MILLISECOND, 0);
+        calendar.set(Calendar.SECOND, 0);
+        Log.d("Wallpaper", "current: "+currentTime+" setting: "+calendar.getTime().getTime() +" diff "+(calendar.getTime().getTime()-currentTime));
 
-        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(),
-                interval, PendingIntent.getBroadcast(this, 0, i, 0));
+        alarmManager.setInexactRepeating(AlarmManager.RTC_WAKEUP, calendar.getTimeInMillis(), interval, pendingIntent);
 
         Log.i("Wallpaper", "Setting wallpaper alarm for "+startHour+":"+startMinute+" and every "+intervalString);
     }
