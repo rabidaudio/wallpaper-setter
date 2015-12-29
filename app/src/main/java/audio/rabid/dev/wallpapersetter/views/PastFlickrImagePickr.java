@@ -1,14 +1,9 @@
 package audio.rabid.dev.wallpapersetter.views;
 
-import android.content.ContentValues;
-import android.content.Context;
 import android.content.DialogInterface;
-import android.content.Intent;
+import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.net.Uri;
 import android.os.Bundle;
-import android.os.Environment;
-import android.provider.MediaStore;
 import android.support.v7.app.AlertDialog;
 import android.support.v7.app.AppCompatActivity;
 import android.view.LayoutInflater;
@@ -20,25 +15,23 @@ import android.widget.ImageView;
 
 import com.jakewharton.disklrucache.DiskLruCache;
 
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import audio.rabid.dev.wallpapersetter.R;
-import audio.rabid.dev.wallpapersetter.Utils;
 import audio.rabid.dev.wallpapersetter.WallpaperGetter;
 import audio.rabid.dev.wallpapersetter.WallpaperSetService;
 
 public class PastFlickrImagePickr extends AppCompatActivity {
 
     WallpaperGetter wallpaperGetter;
-
     GridView imageHolder;
 
-//    Map<String, DiskLruCache.Snapshot> snapshots;
+//    LruCache<String, Bitmap> bitmaps = new LruCache<>(50);
 
+    Map<String, Bitmap> bitmaps = new HashMap<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -49,27 +42,41 @@ public class PastFlickrImagePickr extends AppCompatActivity {
 
         wallpaperGetter = new WallpaperGetter(this);
 
-        imageHolder.setAdapter(new ImageListAdapter(this, wallpaperGetter.getAllStoredFlickrImages()));
+        updateHolder();
+    }
 
-//        snapshots = ;
-//        viewKeys = new HashMap<>(snapshots.size());
-
-//        for(Map.Entry<String, DiskLruCache.Snapshot> snapshot : snapshots.entrySet()){
-//            ImageView iv = new ImageView(this);
-//            InputStream is = snapshot.getValue().getInputStream(0);
-//            Bitmap bm = BitmapFactory.decodeStream(is);
-//            iv.setImageBitmap(bm);
-//            iv.setOnClickListener(this);
-//            iv.setOnLongClickListener(this);
-//            viewKeys.put(iv, snapshot.getKey());
-//            imageHolder.addView(iv);
-//        }
+    private void updateHolder(){
+        Map<String, DiskLruCache.Snapshot> snapshots = wallpaperGetter.getAllStoredFlickrImages();
+        List<String> includedKeys = new ArrayList<>(bitmaps.keySet());
+        for(Map.Entry<String, DiskLruCache.Snapshot> s : snapshots.entrySet()){
+            if(includedKeys.contains(s.getKey())){
+                //we've already got this one
+                includedKeys.remove(s.getKey());
+            }else{
+                //load this bitmap
+                bitmaps.put(s.getKey(), BitmapFactory.decodeStream(s.getValue().getInputStream(0)));
+            }
+        }
+        for(String key : includedKeys){
+            //any keys that were in the old list but not the new list should be cleared from the map
+            bitmaps.remove(key);
+        }
+        imageHolder.setAdapter(new ImageListAdapter(new ArrayList<>(bitmaps.keySet())));
     }
 
     private void setWallpaper(String key){
         WallpaperSetService.setPastBackground(this, key);
     }
 
+    @Override
+    protected void onDestroy(){
+        super.onDestroy();
+        //avoid OOM errors by explicitly freeing bitmaps
+        bitmaps.clear();
+        imageHolder.setAdapter(null);
+    }
+
+    /*
     private Uri addToGallery(String name, InputStream is){
         // add to gallery
 //                MediaStore.Images.Media.insertImage(getContentResolver(), result.getAbsolutePath(), result.getName(), null);
@@ -95,21 +102,14 @@ public class PastFlickrImagePickr extends AppCompatActivity {
         }
         return null;
     }
-
+    */
 
     public class ImageListAdapter extends ArrayAdapter<String> {
-        private Context context;
         private LayoutInflater inflater;
 
-        private Map<String, DiskLruCache.Snapshot> snapshots;
-
-        public ImageListAdapter(Context context, Map<String, DiskLruCache.Snapshot> snapshots) {
-            super(context, R.layout.listview_item_image, snapshots.keySet().toArray(new String[snapshots.keySet().size()]));
-
-            this.context = context;
-            this.snapshots = snapshots;
-
-            inflater = LayoutInflater.from(context);
+        public ImageListAdapter(List<String> keys) {
+            super(PastFlickrImagePickr.this, R.layout.listview_item_image, keys);
+            inflater = LayoutInflater.from(PastFlickrImagePickr.this);
         }
 
         @Override
@@ -117,9 +117,9 @@ public class PastFlickrImagePickr extends AppCompatActivity {
             if (convertView == null) {
                 convertView = inflater.inflate(R.layout.listview_item_image, parent, false);
                 final String key = getItem(position);
-                DiskLruCache.Snapshot s = snapshots.get(key);
-                InputStream is =  s.getInputStream(0);
-                ((ImageView) convertView).setImageBitmap(BitmapFactory.decodeStream(is));
+                Bitmap b = bitmaps.get(key);
+                if(b == null) return convertView;
+                ((ImageView) convertView).setImageBitmap(b);
                 convertView.setOnClickListener(new View.OnClickListener() {
                     @Override
                     public void onClick(View v) {
@@ -142,15 +142,26 @@ public class PastFlickrImagePickr extends AppCompatActivity {
                                                 setWallpaper(key);
                                                 break;
                                             case 1:
-                                                Uri local = addToGallery(key, snapshots.get(key).getInputStream(0));
+                                                /*
+//                                                Uri local = addToGallery(key, snapshots.get(key).getInputStream(0));
+//                                                File f = new File(getCacheDir(),"temp.png");
+                                                try {
+                                                    Utils.pipe(snapshots.get(key).getInputStream(0), openFileOutput("share.png", MODE_PRIVATE));
+                                                }catch (IOException e){
+                                                    throw new RuntimeException(e);
+                                                }
+                                                Uri local = Uri.fromFile(getFileStreamPath("share.png"));
                                                 Intent i = new Intent(Intent.ACTION_SEND);
                                                 i.setType("image/jpeg");
                                                 i.putExtra(Intent.EXTRA_STREAM, local);
+                                                i.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
                                                 startActivity(Intent.createChooser(i, "Share Image"));
+                                                */
+
                                                 break;
                                             case 2:
                                                 wallpaperGetter.removeFlickrImageByKey(key);
-                                                v.setVisibility(View.GONE); //TODO animate
+                                                updateHolder();
                                                 break;
                                         }
                                     }
@@ -161,15 +172,6 @@ public class PastFlickrImagePickr extends AppCompatActivity {
                     }
                 });
             }
-
-//
-//            Bitmap bm = BitmapFactory.decodeStream(is);
-//            iv.setImageBitmap(bm);
-//            iv.setOnClickListener(this);
-//            iv.setOnLongClickListener(this);
-//            viewKeys.put(iv, snapshot.getKey());
-
-
             return convertView;
         }
     }
